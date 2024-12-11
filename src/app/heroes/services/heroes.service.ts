@@ -20,4 +20,9 @@ export class HeroesService {
         catchError( error => of(undefined) )
       )
   }
+
+  // Aunque la búsqueda puede ser vacía, que no tenga valores, igualmente va a devolver un array, vacío pero un array.
+  getSuggestions(query: string):Observable<Hero[]> {
+    return this.httpClient.get<Hero[]>(`${this.baseUrl}/heroes?q=${query}&_limit=6`);
+  }
 }
