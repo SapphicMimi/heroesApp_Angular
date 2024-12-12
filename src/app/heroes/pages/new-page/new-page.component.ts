@@ -1,15 +1,35 @@
-import { Component } from '@angular/core';
+import { Component, OnInit} from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { Hero, Publisher } from '../../interfaces/hero.interface';
 import { HeroesService } from '../../services/heroes.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { switchMap } from 'rxjs';
 
 @Component({
   selector: 'heroes-new-page',
   templateUrl: './new-page.component.html',
   styles: ``
 })
-export class NewPageComponent {
-  constructor(private heroesService: HeroesService) {}
+export class NewPageComponent implements OnInit {
+  constructor(
+    private heroesService: HeroesService,
+    private activatedRoute: ActivatedRoute,
+    private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    if(!this.router.url.includes('edit')) return;
+
+    this.activatedRoute.params
+      .pipe(
+        switchMap(({id}) => this.heroesService.getHeroById(id)),
+      ).subscribe(hero => {
+        if(!hero) return this.router.navigateByUrl('/');
+
+        this.heroForm.reset(hero);
+        return;
+      })
+  }
 
   public heroForm = new FormGroup({
     id: new FormControl<string>(''),
