@@ -3,7 +3,7 @@ import { FormControl, FormGroup } from '@angular/forms';
 import { Hero, Publisher } from '../../interfaces/hero.interface';
 import { HeroesService } from '../../services/heroes.service';
 import { ActivatedRoute, Router } from '@angular/router';
-import { switchMap } from 'rxjs';
+import { filter, switchMap, tap } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatDialog } from '@angular/material/dialog';
 import { ConfirmDialogComponent } from '../../components/confirm-dialog/confirm-dialog.component';
@@ -83,12 +83,28 @@ export class NewPageComponent implements OnInit {
       data: this.heroForm.value
     })
 
-    dialogRef.afterClosed().subscribe(result => {
-      if(!result) return;
+    dialogRef.afterClosed()
+      .pipe(
+        // Este filtro, solo deja pasar dependiendo del valor de result, si es true deja pasar, si es false no,
+        // por eso la existencia de este filter.
+        filter((result: boolean) => result),
+        switchMap(() => this.heroesService.deleteHeroById(this.currentHero.id)),
+        filter((wasDeleted: boolean) => wasDeleted)
+      )
+      .subscribe(() => {
+        this.router.navigateByUrl('heroes/list');
+      })
 
-      this.heroesService.deleteHeroById(this.currentHero.id);
-      this.router.navigateByUrl('heroes/list');
-    })
+    // dialogRef.afterClosed().subscribe(result => {
+    //   if(!result) return;
+
+    //   this.heroesService.deleteHeroById(this.currentHero.id)
+    //     .subscribe(wasDeleted => {
+    //       if(wasDeleted) {
+    //         this.router.navigateByUrl('heroes/list');
+    //       }
+    //     });
+    // })
   }
 
   showSnackbar(message: string): void {
