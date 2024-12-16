@@ -3,7 +3,7 @@ import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { Hero } from '../../interfaces/hero.interface';
 
 @Component({
-  selector: 'app-confirm-dialog',
+  selector: 'heroes-confirm-dialog',
   templateUrl: './confirm-dialog.component.html',
   styles: ``
 })
